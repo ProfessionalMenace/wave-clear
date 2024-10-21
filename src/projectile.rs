@@ -1,9 +1,10 @@
 use bevy::prelude::*;
-use bevy::asset::LoadedFolder;
+use std::collections::HashMap;
 
 pub struct ProjectilePlugin;
 impl Plugin for ProjectilePlugin {
     fn build(&self, app: &mut App) {
+        app.add_systems(Startup, projectiles_spawner);
         app.add_systems(Update, projectiles_move);
         app.add_systems(Update, projectiles_despawn);
     }
@@ -11,29 +12,30 @@ impl Plugin for ProjectilePlugin {
 
 #[allow(dead_code)]
 #[derive(Resource)]
-struct ProjectileLoader
+pub struct ProjectileSpawner
 {
-    handles: Handle<LoadedFolder>,
+    pub spawner: Option<HashMap<String, Projectile>>, // path, projectile
 }
 
-#[allow(dead_code)]
-fn load_projectile_textures(
+fn projectiles_spawner(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    let projectile_loader = ProjectileLoader{
-        handles: asset_server.load_folder("assets/Projectiles"),
-    };
-    commands.insert_resource(projectile_loader);
+    let mut projectiles_spawner = ProjectileSpawner { spawner: None };
+    let spawner = HashMap::from([
+        (String::from("default"), Projectile{ damage: 32, velocity: Vec3::new(32.0, 0.0, 0.0), radius: 16.0 })
+    ]);
+    projectiles_spawner.spawner = Some(spawner);
+    commands.insert_resource(projectiles_spawner);
 }
 
 #[allow(dead_code)]
 #[derive(Component, Clone, Copy)]
 pub struct Projectile
 {
-    pub damage: i32,
+    pub damage: i32, // unused
     pub velocity: Vec3,
-    pub radius: f32,
+    pub radius: f32, // unused
 }
 
 #[derive(Bundle)]
@@ -47,8 +49,10 @@ pub fn projectile_create(
     translation: Vec3,
     image_handle: Handle<Image>,
 ) -> ProjectileBundle{
+    // let image_handle = projectiles_spawner. 
+    // testing values will be removed after adding spawning system
     ProjectileBundle {
-        projectile: Projectile { // testing values will be removed after adding spawning system
+        projectile: Projectile {
             damage: 32,
             velocity: Vec3::new(32.0, 0.0, 0.0),
             radius: 10.0,
@@ -60,6 +64,7 @@ pub fn projectile_create(
         },
     }
 }
+
 // update every frame, linear movement
 pub fn projectiles_move(
     time: Res<Time>,
@@ -71,6 +76,7 @@ pub fn projectiles_move(
     }
 }
 
+// maybe combine into singular function
 pub fn projectiles_despawn(
     mut commands: Commands, 
     windows: Query<&Window>,
@@ -78,7 +84,8 @@ pub fn projectiles_despawn(
 ){
     let window = windows.single();
     for (entity, transform) in entities.iter(){
-        if transform.translation.x > window.width()/2.0 // add better bounds check
+        // add better despawns check
+        if transform.translation.x > window.width()/2.0
         {
             commands.entity(entity).remove::<ProjectileBundle>();
         }
