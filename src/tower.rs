@@ -7,14 +7,15 @@ pub struct TowerPlugin;
 impl Plugin for TowerPlugin
 {
     fn build(&self, app: &mut App) {
-        // app.add_systems(Startup, );
         app.add_systems(Update, tower_update);
+        app.add_systems(Update, tower_despawn);
     }
 }
 
 #[derive(Component)]
 pub struct Tower
 {
+    pub health: i32,
     pub stopwatch: Stopwatch,
     pub cooldown: Duration,
 }
@@ -34,6 +35,7 @@ pub fn tower_create(
     let translation = Vec3::new(pos.x, pos.y, 0.0);
     TowerBundle {
         tower: Tower {
+            health: 100,
             stopwatch: Stopwatch::new(),
             cooldown: Duration::from_secs(4),
         },
@@ -67,5 +69,16 @@ pub fn tower_update(
             tower.stopwatch.reset();
         }
         tower.stopwatch.tick(time.delta());
+    }
+}
+
+pub fn tower_despawn(
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut Tower)>,
+) {
+    for (entity, tower) in &mut query {
+        if tower.health < 1 {
+            commands.entity(entity).remove::<TowerBundle>();
+        }
     }
 }
