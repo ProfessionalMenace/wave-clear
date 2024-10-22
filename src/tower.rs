@@ -52,20 +52,24 @@ pub fn tower_update(
     time: Res<Time>,
     mut commands: Commands,
     asset_server: Res<AssetServer>, // maybe posible to remove
-    _projectiles_spawner: Res<ProjectileSpawner>, // should contain sprite handle
+    projectiles_spawner: Res<ProjectileSpawner>, // should contain sprite handle
     mut query: Query<(&mut Tower, &Transform)>,
 ){
-    // todo add check health
-    // todo load projectile spawner
     for (mut tower, transform) in &mut query
     {
         if tower.stopwatch.elapsed() > tower.cooldown
         {
-            let projectile = projectile_create( // todo clone projectile
-                transform.translation, 
-                asset_server.load("Projectiles/Default.png")
-            );
-            commands.spawn(projectile);
+           if let Some(projectile) = projectiles_spawner.spawner.get("default") {
+                let bundle = ProjectileBundle{
+                    projectile: projectile.clone(),
+                    sprite_bundle: SpriteBundle{
+                        transform: Transform::from_translation(transform.translation),
+                        texture: asset_server.load("Projectiles/Default.png"),
+                        ..default()
+                    },
+                };
+                commands.spawn(bundle);
+            };
             tower.stopwatch.reset();
         }
         tower.stopwatch.tick(time.delta());

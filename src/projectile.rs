@@ -14,18 +14,20 @@ impl Plugin for ProjectilePlugin {
 #[derive(Resource)]
 pub struct ProjectileSpawner
 {
-    pub spawner: Option<HashMap<String, Projectile>>, // path, projectile
+    pub default: Projectile,
+    pub spawner: HashMap<String, Projectile>,
 }
 
 fn projectiles_spawner(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    _asset_server: Res<AssetServer>,
 ) {
-    let mut projectiles_spawner = ProjectileSpawner { spawner: None };
-    let spawner = HashMap::from([
-        (String::from("default"), Projectile{ damage: 32, velocity: Vec3::new(32.0, 0.0, 0.0), radius: 16.0 })
-    ]);
-    projectiles_spawner.spawner = Some(spawner);
+    let projectiles_spawner = ProjectileSpawner {
+        default: Projectile{ damage: 0, velocity: Vec3::splat(0.0), radius: 0.0 }, 
+        spawner: HashMap::from([
+        (String::from("default"), Projectile{ damage: 32, velocity: Vec3::new(32.0, 0.0, 0.0), radius: 16.0 }),
+        ]),
+    };
     commands.insert_resource(projectiles_spawner);
 }
 
@@ -43,26 +45,6 @@ pub struct ProjectileBundle
 {
     pub projectile: Projectile,
     pub sprite_bundle: SpriteBundle,
-}
-
-pub fn projectile_create(
-    translation: Vec3,
-    image_handle: Handle<Image>,
-) -> ProjectileBundle{
-    // let image_handle = projectiles_spawner. 
-    // testing values will be removed after adding spawning system
-    ProjectileBundle {
-        projectile: Projectile {
-            damage: 32,
-            velocity: Vec3::new(32.0, 0.0, 0.0),
-            radius: 10.0,
-            },
-        sprite_bundle: SpriteBundle {
-            texture: image_handle,
-            transform: Transform::from_translation(translation),
-            ..default()
-        },
-    }
 }
 
 // update every frame, linear movement
