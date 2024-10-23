@@ -52,15 +52,14 @@ pub fn tower_update(
     time: Res<Time>,
     mut commands: Commands,
     asset_server: Res<AssetServer>, // maybe posible to remove
-    projectiles_spawner: Res<ProjectileSpawner>, // should contain sprite handle
+    spawner : Res<ProjectileSpawner>, // should contain sprite handle
     mut query: Query<(&mut Tower, &Transform)>,
 ){
-    let spawner = projectiles_spawner.spawner.clone(); // to clone or not to clone
     for (mut tower, transform) in &mut query
     {
         if tower.stopwatch.elapsed() > tower.cooldown
         {
-            let Some(projectile) = spawner.get("default") else {
+            let Some(projectile) = spawner.spawner.get("default") else {
                continue; // skips the reset -> tries spawn every time
             };
             let bundle = ProjectileBundle{
