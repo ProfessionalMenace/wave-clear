@@ -55,21 +55,23 @@ pub fn tower_update(
     projectiles_spawner: Res<ProjectileSpawner>, // should contain sprite handle
     mut query: Query<(&mut Tower, &Transform)>,
 ){
+    let spawner = projectiles_spawner.spawner.clone(); // to clone or not to clone
     for (mut tower, transform) in &mut query
     {
         if tower.stopwatch.elapsed() > tower.cooldown
         {
-           if let Some(projectile) = projectiles_spawner.spawner.get("default") {
-                let bundle = ProjectileBundle{
-                    projectile: projectile.clone(),
-                    sprite_bundle: SpriteBundle{
-                        transform: Transform::from_translation(transform.translation),
-                        texture: asset_server.load("Projectiles/Default.png"),
-                        ..default()
-                    },
-                };
-                commands.spawn(bundle);
+            let Some(projectile) = spawner.get("default") else {
+               continue; // skips the reset -> tries spawn every time
             };
+            let bundle = ProjectileBundle{
+                projectile: projectile.clone(),
+                sprite_bundle: SpriteBundle{
+                    transform: Transform::from_translation(transform.translation),
+                    texture: asset_server.load("Projectiles/Default.png"),
+                    ..default()
+                },
+            };
+            commands.spawn(bundle);
             tower.stopwatch.reset();
         }
         tower.stopwatch.tick(time.delta());
