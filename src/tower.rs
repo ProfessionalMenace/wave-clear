@@ -2,20 +2,19 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy::time::Stopwatch;
 use crate::projectile::*;
+use crate::health::Health;
 
 pub struct TowerPlugin;
 impl Plugin for TowerPlugin
 {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, tower_update);
-        app.add_systems(Update, tower_despawn);
     }
 }
 
 #[derive(Component)]
 pub struct Tower
 {
-    pub health: i32,
     pub stopwatch: Stopwatch,
     pub cooldown: Duration,
 }
@@ -24,6 +23,7 @@ pub struct Tower
 pub struct TowerBundle
 {
     pub tower: Tower,
+    pub health: Health,
     pub sprite: SpriteBundle,
 }
 
@@ -35,10 +35,10 @@ pub fn tower_create(
     let translation = Vec3::new(pos.x, pos.y, 0.0);
     TowerBundle {
         tower: Tower {
-            health: 100,
             stopwatch: Stopwatch::new(),
             cooldown: Duration::from_secs(4),
         },
+        health: Health { hp: 100 },
         sprite: SpriteBundle {
             texture: image_handle,
             transform: Transform::from_translation(translation),
@@ -60,7 +60,7 @@ pub fn tower_update(
         if tower.stopwatch.elapsed() > tower.cooldown
         {
             let Some(projectile) = spawner.spawner.get("default") else {
-               continue; // skips the reset -> tries spawn every time
+                continue; // skips the reset -> tries spawn every time
             };
             let bundle = ProjectileBundle{
                 projectile: projectile.clone(),
@@ -74,16 +74,5 @@ pub fn tower_update(
             tower.stopwatch.reset();
         }
         tower.stopwatch.tick(time.delta());
-    }
-}
-
-pub fn tower_despawn(
-    mut commands: Commands,
-    mut query: Query<(Entity, &mut Tower)>,
-) {
-    for (entity, tower) in &mut query {
-        if tower.health < 1 {
-            commands.entity(entity).remove::<TowerBundle>();
-        }
     }
 }

@@ -2,10 +2,12 @@ use bevy::prelude::*;
 mod inputs;
 mod tower;
 mod projectile;
+mod health;
 
 use crate::projectile::ProjectilePlugin;
 use crate::tower::TowerPlugin;
 use crate::inputs::InputHandlePlugin;
+use crate::health::HealthPlugin;
 
 fn main() { 
     let mut app = App::new();
@@ -13,6 +15,7 @@ fn main() {
     app.add_plugins(InputHandlePlugin);
     app.add_plugins(ProjectilePlugin);
     app.add_plugins(TowerPlugin);
+    app.add_plugins(HealthPlugin);
     app.add_systems(Startup, scene_setup);
     app.run();
 }
