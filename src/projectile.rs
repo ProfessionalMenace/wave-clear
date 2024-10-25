@@ -12,17 +12,11 @@ impl Plugin for ProjectilePlugin {
 
 #[derive(Resource)]
 pub struct ProjectileSpawner {
-    pub default: Projectile,
     pub spawner: HashMap<String, ProjectileBundle>,
 }
 
 fn projectiles_spawner(mut commands: Commands, asset_server: Res<AssetServer>) {
     let projectiles_spawner = ProjectileSpawner {
-        default: Projectile {
-            damage: 0,
-            velocity: Vec3::splat(0.0),
-            radius: 0.0,
-        },
         spawner: HashMap::from([(
             String::from("default"),
             ProjectileBundle {
@@ -41,6 +35,7 @@ fn projectiles_spawner(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(projectiles_spawner);
 }
 
+#[allow(dead_code)]
 #[derive(Component, Clone, Copy)]
 pub struct Projectile {
     pub damage: i32, // unused
