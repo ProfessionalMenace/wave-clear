@@ -8,7 +8,7 @@ impl Plugin for HealthPlugin
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Clone, Copy)]
 pub struct Health {
     pub hp: i32,
 }
