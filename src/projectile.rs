@@ -10,7 +10,6 @@ impl Plugin for ProjectilePlugin {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Resource)]
 pub struct ProjectileSpawner {
     pub default: Projectile,
@@ -42,7 +41,6 @@ fn projectiles_spawner(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(projectiles_spawner);
 }
 
-#[allow(dead_code)]
 #[derive(Component, Clone, Copy)]
 pub struct Projectile {
     pub damage: i32, // unused
