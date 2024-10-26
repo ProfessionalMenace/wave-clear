@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use std::collections::HashMap;
+use crate::spawner::Spawner;
 
 pub struct ProjectilePlugin;
 impl Plugin for ProjectilePlugin {
@@ -10,29 +10,19 @@ impl Plugin for ProjectilePlugin {
     }
 }
 
-#[derive(Resource)]
-pub struct ProjectileSpawner {
-    pub spawner: HashMap<String, ProjectileBundle>,
-}
-
 fn projectiles_spawner(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let projectiles_spawner = ProjectileSpawner {
-        spawner: HashMap::from([(
-            String::from("default"),
-            ProjectileBundle {
-                projectile: Projectile {
-                    damage: 32,
-                    velocity: Vec3::new(32.0, 0.0, 0.0),
-                    radius: 16.0,
-                },
-                sprite: SpriteBundle {
-                    texture: asset_server.load("Projectiles/Default.png"),
-                    ..default()
-                },
-            },
-        )]), 
+    let default = ProjectileBundle {
+        projectile: Projectile {
+            damage: 100,
+            velocity: Vec3::new(32.0, 0.0, 0.0),
+            radius: 32.0,
+        },
+        sprite: SpriteBundle {
+            texture: asset_server.load("Projectiles/Default"),
+            ..default()
+        },
     };
-    commands.insert_resource(projectiles_spawner);
+    commands.insert_resource(Spawner::new(&default));
 }
 
 #[allow(dead_code)]

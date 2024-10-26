@@ -3,6 +3,7 @@ mod inputs;
 mod tower;
 mod projectile;
 mod health;
+mod enemy;
 
 use crate::projectile::ProjectilePlugin;
 use crate::tower::TowerPlugin;
