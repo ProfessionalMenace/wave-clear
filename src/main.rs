@@ -4,6 +4,7 @@ mod tower;
 mod projectile;
 mod health;
 mod enemy;
+mod spawner;
 
 use crate::projectile::ProjectilePlugin;
 use crate::tower::TowerPlugin;
