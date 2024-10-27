@@ -1,14 +1,12 @@
 use bevy::prelude::*;
 use std::collections::HashMap;
 
-#[allow(dead_code)]
 #[derive(Resource)]
 pub struct Spawner<T> {
     default: T,
     spawner: HashMap<String, T>,
 }
 
-#[allow(dead_code)]
 impl<T> Spawner<T>
 where
     T: Clone
